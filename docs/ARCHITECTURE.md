@@ -162,6 +162,7 @@ Lifecycle controls:
 - `--check-update` checks whether a newer launcher release exists and exits
 - `--update-launcher` updates the launcher via git pull, Homebrew upgrade, or manual release URL guidance
 - normal interactive launches check for a newer launcher release at most once per day unless `DCLAUDE_NO_UPDATE_CHECK=1` is set
+- when that interactive check updates the launcher successfully, the wrapper re-execs itself once with `DCLAUDE_NO_UPDATE_CHECK=1` so startup continues on the new code without prompting again
 
 Tool launch commands:
 

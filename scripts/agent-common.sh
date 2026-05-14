@@ -33,6 +33,7 @@ CHECK_LAUNCHER_UPDATE=0
 ASSUME_YES=0
 AGENT_PROFILE=""
 LIST_PROFILES=0
+ORIGINAL_WRAPPER_ARGS=()
 LAUNCHER_UPDATE_AVAILABLE=0
 LAUNCHER_UPDATE_LATEST=""
 LAUNCHER_UPDATE_METHOD=""
@@ -721,6 +722,18 @@ run_launcher_update() {
   esac
 }
 
+restart_wrapper_after_launcher_update() {
+  local script_path="${SCRIPT_PATH:-}"
+
+  [ -n "$script_path" ] || die "cannot restart launcher: SCRIPT_PATH is not set"
+  [ -f "$script_path" ] || die "cannot restart launcher: missing wrapper at $script_path"
+
+  echo "Updated dclaude launcher from $DCLAUDE_VERSION to $LAUNCHER_UPDATE_LATEST" >&2
+  echo "Restarting $WRAPPER_NAME with the updated launcher..." >&2
+
+  exec env DCLAUDE_NO_UPDATE_CHECK=1 "$script_path" "${ORIGINAL_WRAPPER_ARGS[@]}"
+}
+
 print_launcher_update_status() {
   if [ "$LAUNCHER_UPDATE_AVAILABLE" -eq 1 ]; then
     echo "dclaude update available: current=$DCLAUDE_VERSION latest=$LAUNCHER_UPDATE_LATEST" >&2
@@ -793,8 +806,7 @@ maybe_prompt_launcher_update() {
   prompt_yes_no "Update dclaude launcher now using $LAUNCHER_UPDATE_DETAIL?" || prompt_status=$?
   if [ "$prompt_status" -eq 0 ]; then
     run_launcher_update
-    echo "Updated dclaude launcher. Rerun $WRAPPER_NAME to continue with the new version." >&2
-    exit 0
+    restart_wrapper_after_launcher_update
   fi
 }
 
@@ -1318,6 +1330,7 @@ launch_agent() {
   : "${TOOL_HOME:?TOOL_HOME must be set by the launcher}"
 
   WRAPPER_NAME="d${tool}"
+  ORIGINAL_WRAPPER_ARGS=("$@")
   parse_wrapper_args "$@"
   validate_wrapper_args
 

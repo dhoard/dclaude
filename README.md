@@ -407,7 +407,7 @@ dclaude --update-launcher
 dclaude --update-launcher --yes
 ```
 
-`--update-launcher` uses `git -C "$TOOL_HOME" pull --ff-only` for git-clone installs, `brew update && brew upgrade dclaude` for Homebrew installs, and prints the release URL for other install shapes.
+`--update-launcher` uses `git -C "$TOOL_HOME" pull --ff-only` for git-clone installs, `brew update && brew upgrade dclaude` for Homebrew installs, and prints the release URL for other install shapes. When the launcher offers an update during a normal interactive start and you accept it, it restarts itself automatically with the updated code instead of asking you to rerun the command manually.
 
 ## Tool Pin Refreshes
 
